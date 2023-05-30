@@ -1,0 +1,1835 @@
+% \iffalse meta-comment
+% !TEX program  = pdfLaTeX
+
+%<*internal>
+\iffalse
+%</internal>
+
+%<*readme>
+----------------------------------------------------------------------
+`counterz' --- 2023/05/30 Version 1.1.0
+
+Copyright (C) 2023 by Christopher McClain
+E-mail: christopher.mcclain@mail.wvu.edu
+
+Released under the LaTeX Project Public License v1.3c or later
+See https://www.latex-project.org/lppl.txt
+----------------------------------------------------------------------
+
+The `counterz' package provides additional tools for manipulating
+counters. The package facilitates the use of stealth prefixes for
+counter names in order to help distinguish between counters from
+multiple input files. The package also provides a means to generate
+random counters and save such counter values for future typesetting.
+%</readme>
+
+%<*internal>
+\fi
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
+%</internal>
+
+%<*install>
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+
+\preamble
+----------------------------------------------------------------------
+`counterz' --- 2023/05/30 Version 1.1.0 Additional tools for counters
+E-mail: christopher.mcclain@mail.wvu.edu
+Released under the LaTeX Project Public License v1.3c or later
+See https://www.latex-project.org/lppl.txt
+----------------------------------------------------------------------
+
+\endpreamble
+\postamble
+
+Copyright (C) 2023 by Christopher McClain
+
+This work may be distributed and/or modified under the
+conditions of the LaTeX Project Public License (LPPL), either
+version 1.3c of this license or (at your option) any later
+version. The latest version of this license is in the file:
+
+https://www.latex-project.org/lppl.txt
+
+and version 1.3 or later is part of all  distributions of
+LaTeX version 2005/12/01 or later.
+
+This work has the LPPL maintenance status `maintained'.
+ 
+The Current Maintainer of this work is Christopher McClain.
+
+This work consists of the file  counterz.dtx
+and the derived files           counterz.ins,
+                                counterz.pdf and
+                                counterz.sty.
+
+\endpostamble
+
+\usedir{tex/latex/counterz}
+\generate{
+  \file{\jobname.sty}{\from{\jobname.dtx}{package}}
+}
+
+%</install>
+%<install>\endbatchfile
+
+%<*internal>
+\usedir{source/latex/counterz}
+\generate{
+  \file{\jobname.ins}{\from{\jobname.dtx}{install}}
+}
+\nopreamble\nopostamble
+\usedir{doc/latex/counterz}
+\generate{
+  \file{README.txt}{\from{\jobname.dtx}{readme}}
+}
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile
+\else
+  \expandafter\endgroup
+\fi
+%</internal>
+
+%<*package>
+\NeedsTeXFormat{LaTeX2e}
+%</package>
+
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{\jobname}
+\usepackage[numbered]{hypdoc}
+\EnableCrossrefs
+\DoNotIndex{\addtocounter,\Alph,\alph,\arabic,\begingroup,\boolfalse,\booltrue,
+            \catcode,\endgroup,\fnsymbol,\gdef,\ifbool,\ifboolexpr,\ifnumequal,
+            \ifnumgreater,\ifnumless,\immediate,\jobname,\newcommand,
+            \newcounter,\newbool,\newwrite,\numexpr,\openout,\pdfuniformdeviate,
+            \providecounter,\ProvidesPackage,\relax,\renewcommand,
+            \RequirePackage,\Roman,\roman,\setcounter,\the,\unexpanded,\value,
+            \whileboolexpr,\write,\@ifnextchar,\ifltxcounter,\InputIfFileExists,
+            \m@k@gobbleendoptarg,\MessageBreak,\PackageError,\protect,\space,
+            \typein,\@typein}
+\CodelineIndex
+\RecordChanges
+\begin{document}
+   \DocInput{\jobname.dtx}
+\end{document}
+%</driver>
+%
+% \fi
+%
+%\GetFileInfo{\jobname.sty}
+%
+%\title{^^A
+%  The \textsf{counterz} package\thanks{^^A
+%    This file describes version \fileversion, last revised \filedate.^^A
+%  }^^A
+%}
+%\author{^^A
+%  Christopher McClain\thanks{E-mail: christopher.mcclain@mail.wvu.edu}^^A
+%}
+%\date{Released \filedate}
+%
+%\maketitle
+%
+%\changes{v1.0.0}{2023/05/19}{First public release}
+%\changes{v1.1.0}{2023/05/30}{New and revised commands and error reports}
+%
+%
+%\begin{abstract}
+% The \textsf{counterz} package provides additional tools for manipulating
+% counters. The package facilitates the use of stealth prefixes for
+% counter names in order to help distinguish between counters from
+% multiple input files. The package also provides a means to generate
+% random counters and save such counter values for future typesetting. 
+%\end{abstract}
+%
+%\begin{multicols}{2}
+%  \tableofcontents
+%\end{multicols}
+%
+%\section{Introduction}
+%
+%\subsection{About}
+%
+% This project emerged from the author's frequent use of \LaTeX\ counters as
+% traditional integer type variables when generating mathematics documents with
+% random elements. While pdf\TeX\ primitives such as \cs{pdfuniformdeviate} may
+% be used to generate random integers, these integer values will be randomized
+% with every typesetting. The \textsf{counterz} package provides a way to save
+% the values of counters. Another \textsf{.tex} file is created so that, if
+% desired, it can be inputted upon a subsequent typesetting in order to
+% initialize the counters with the previously generated values. A boolean
+% variable and accompanying commands allow an author to toggle between reusing
+% and rerandomizing counters.
+%
+% One of the consequences of preloading counter values in large projects with
+% multiple source files is that one must take care to use distinct counter names
+% throughout all of the different files. If the file \textsf{Main.tex} inputs
+% \textsf{File1.tex} and \textsf{File2.tex}, and both input files define the
+% counter \textit{mycounter}, then this could result in typesetting errors. One
+% way to address this problem is to prefix every counter name with the file name
+% or some other marker so that the counter names will actually be distinct. For
+% example, \textit{File1mycounter} is distinct from \textit{File2mycounter}.
+% Very long counter names, however, can make code difficult to read and hinder
+% consistent application of this practice. The \textsf{counterz} package
+% provides a way to stealthily define and recall such prefixes so that the
+% shorter non-prefixed names can be used for the manipulation, recall, and
+% typesetting of counters.
+%
+%\subsection{License}
+%
+% Copyright \copyright\ 2023 Christopher McClain. This software may be copied,
+% distributed, and/or modified under the %terms of the
+% \href{https://www.latex-project.org/lppl/}{LaTeX Project Public License},
+% either version 1.3c of this license or any later version.
+%
+%\subsection{Installation}
+%
+% Run (pdf)\TeX{} on counterz.dtx to generate the file counterz.sty, and copy it
+% to your local texmf directory. To generate both the package file counterz.sty
+% and the documentation counterz.pdf, run (pdf)\LaTeX{} on counterz.dtx.
+% Typesetting the documentation requires the package \textsf{hypdoc} which is
+% included in \TeX\ distributions and at \href{http://www.ctan.org}
+% {The Comprehensive TeX Archive Network}.
+%
+%\section{User Guide}
+%
+% To use this package, include the following line in the preamble of your
+% document:
+%
+%\begin{verbatim}
+%\usepackage{counterz}
+%\end{verbatim}
+%
+% \noindent
+% The package \textsf{counterz} loads the packages \textsf{etoolbox} and
+% \textsf{makecmds}, both of which are included in \TeX\ distributions
+% and at \href{http://www.ctan.org}{The Comprehensive TeX Archive Network}.
+%
+%\subsection{Counter Prefixes}
+%
+% Counter prefixes are stored in an internal macro whose default value is an
+% empty string.
+%\DescribeMacro{\setcounterprefix}
+% The command \cs{setcounterprefix}\marg{prefix} is used to change this value.
+% For example, to change the prefix to \textit{PurpleMonkey}, use
+%
+%\begin{verbatim}
+%\setcounterprefix{PurpleMonkey}
+%\end{verbatim}
+%
+% \noindent
+% and to change it from \textit{PurpleMonkey} to \textit{Dishwasher}, use
+%
+%\begin{verbatim}
+%\setcounterprefix{Dishwasher}
+%\end{verbatim}
+%
+% \noindent
+%\DescribeMacro{\clearcounterprefix}
+% The command \cs{clearcounterprefix} returns the prefix to its empty default.
+%
+%\subsection{Manipulating Counters}
+%
+%\DescribeMacro{\xnewcounter}
+% The command \cs{xnewcounter}\marg{countername} creates a counter with a
+% prefixed name.
+%\DescribeMacro{\xsetcounter}
+% The command \cs{xsetcounter}\marg{countername}\marg{integer} assigns the
+% specified value to the counter with the prefixed name. For example, suppose
+% that the file \textsf{BoringFile1.tex} contains the following:
+%
+%\begin{verbatim}
+%\xnewcounter{bestcounterever}
+%\xsetcounter{bestcounterever}{100}
+%\end{verbatim}
+%
+% \noindent
+% and suppose that the file \textsf{BoringFile2.tex} contains the following:
+%
+%\begin{verbatim}
+%\xnewcounter{bestcounterever}
+%\xsetcounter{bestcounterever}{-29}
+%\end{verbatim}
+%
+% \noindent
+% and, finally, suppose that the file Main.tex contains (in part) the following:
+%
+%\begin{verbatim}
+%\setcounterprefix{PurpleMonkey}
+%\input{BoringFile1}
+%\setcounterprefix{Dishwasher}
+%\input{BoringFile2}
+%\end{verbatim}
+%
+% \noindent
+% Then typesetting \textsf{Main.tex} will create a counter
+% \textit{PurpleMonkeybestcounterever} with the value 100 and a counter
+% \textit{Dishwasherbestcounterever} with the value $-29$. By using commands
+% \cs{xnewcounter} and \cs{xsetcounter} instead of \cs{newcounter} and
+% \cs{setcounter}, \textsf{BoringFile1.tex} and \textsf{BoringFile2.tex}
+% may be written independently without considering any counter name conflicts.
+% The distinction between the counters is determined by the prefixes defined
+% in the file \textsf{Main.tex}. By changing prefixes, \textsf{Main.tex} can
+% even input the same file multiple times without conflict.
+%
+%\DescribeMacro{\xprovidecounter}
+% The commands \cs{xprovidecounter}, \cs{xaddtocounter}, and \cs{xvalue} are
+% likewise prefix versions of commands \cs{providecounter}, \cs{addtocounter},
+%\DescribeMacro{\xaddtocounter}
+% and \cs{value}, respectively. When the prefix is empty, the commands expand
+%\DescribeMacro{\xvalue}
+% like their standard counterparts. (Note: \cs{providecounter} defines a counter
+% if it has not already been defined. See the documentation for the package
+% \textsf{makecmds} for details.)
+%
+%\subsection{Conditional Statements}
+%
+%\DescribeMacro{\ifctrequal}
+% The command \cs{ifctrequal}\marg{counter1}\marg{counter2}\marg{foo}\marg{bar}
+% uses the command \cs{xvalue} to compare the values of the (prefixed) counters
+% and then executes \meta{foo} if the values are equal and otherwise executes
+% \meta{bar}. The commands
+%\DescribeMacro{\ifctrless}
+% \cs{ifctrless} and \cs{ifctrmore} work analogously, based on whether the value
+% of prefixed \meta{counter1} is less than that of of prefixed \meta{counter2}
+%\DescribeMacro{\ifctrmore}
+% or more than that of prefixed \meta{counter2}, respectively. Consider the
+% example code
+%
+%\begin{verbatim}
+%\setcounterprefix{TigerTiger}
+%\xnewcounter{Small}
+%\xsetcounter{Small}{7}
+%\xnewcounter{Large}
+%\xsetcounter{Large}{11}
+%\ifctrequal{Small}{Large}{January}{February}
+%\ifctrless{Small}{Large}{March}{April}
+%\ifctrmore{Small}{Large}{May}{June}
+%\end{verbatim}
+%
+% \noindent
+% which produces the output
+%
+% \bigskip
+%\setcounterprefix{TigerTiger}
+%\xnewcounter{Small}
+%\xsetcounter{Small}{7}
+%\xnewcounter{Large}
+%\xsetcounter{Large}{11}
+%\ifctrequal{Small}{Large}{January}{February}
+%\ifctrless{Small}{Large}{March}{April}
+%\ifctrmore{Small}{Large}{May}{June}
+%
+% \bigskip
+% \noindent
+% because the value of the counter \textit{TigerTigerSmall} is 7 which is less
+% than 11, the value of the counter \textit{TigerTigerLarge}.
+%
+%\DescribeMacro{\ifctrzero}
+% The command \cs{ifctrzero}\marg{counter}\marg{foo}\marg{bar} executes
+% \meta{foo} if the value of the (prefixed) counter is zero and otherwise
+% executes \meta{bar}. The commands 
+%\DescribeMacro{\ifctrneg}
+% \cs{ifctrneg} and \cs{ifctrpos} work analogously based on whether the value
+%\DescribeMacro{\ifctrpos}
+% is negative or positive, respectively. The example code
+%
+%\begin{verbatim}
+%\setcounterprefix{TigerTiger}
+%\xprovidecounter{Small}
+%\xsetcounter{Small}{7}
+%\ifctrzero{Small}{January}{February}
+%\ifctrneg{Small}{March}{April}
+%\ifctrpos{Small}{May}{June}
+%\end{verbatim}
+%
+% \noindent
+% produces the output
+%
+% \bigskip
+%\setcounterprefix{TigerTiger}
+%\xprovidecounter{Small}
+%\xsetcounter{Small}{7}
+%\ifctrzero{Small}{January}{February}
+%\ifctrneg{Small}{March}{April}
+%\ifctrpos{Small}{May}{June}
+%
+% \bigskip
+% \noindent
+% because the value of the counter \textit{TigerTigerSmall} is 7 which is
+% positive (and thus nonzero, as well).
+%
+%\subsection{Displaying Counters}
+%
+%\DescribeMacro{\xarabic}
+% The command \cs{xarabic}\marg{counter} is simply a prefix version of the
+% standard display command \cs{arabic}.
+%\DescribeMacro{\xroman}
+% The commands \cs{xroman}, \cs{xRoman}, \cs{xalph}, \cs{xAlph}, and
+%\DescribeMacro{\xRoman}
+% \cs{xfnsymbol} are likewise prefix versions of the standard display commands
+%\DescribeMacro{\xalph}
+% \cs{roman}, \cs{Roman}, \cs{alph}, \cs{Alph}, and \cs{fnsymbol}, inheriting
+% the restrictions of their
+%\DescribeMacro{\xAlph}
+% parent commands.
+%
+%\DescribeMacro{\xfnsymbol}
+% Note that the code
+%
+%\begin{verbatim}
+%\setcounterprefix{Sneaky}
+%\xprovidecounter{Pete}
+%\xsetcounter{Pete}{42}
+%\arabic{Pete}
+%\end{verbatim}
+%
+% \noindent
+% produces an error because the counter \textit{Pete} is not defined, but the
+% code
+%
+%\begin{verbatim}
+%\setcounterprefix{Sneaky}
+%\xprovidecounter{Pete}
+%\xsetcounter{Pete}{42}
+%\xarabic{Pete}
+%\end{verbatim}
+%
+% \noindent
+% produces the output
+%
+% \bigskip
+%\setcounterprefix{Sneaky}
+%\xprovidecounter{Pete}
+%\xsetcounter{Pete}{42}
+%\xarabic{Pete}
+%
+% \bigskip
+% \noindent
+% which is the value of the counter \textit{SneakyPete}. The code
+%
+%\begin{verbatim}
+%\setcounterprefix{Sneaky}
+%\xprovidecounter{Pete}
+%\xsetcounter{Pete}{42}
+%\clearcounterprefix
+%\xarabic{Pete}
+%\end{verbatim}
+%
+% \noindent
+% also generates error because the final line is trying to use the
+% undefined counter \textit{Pete} after the prefix was returned to its
+% default value.
+%
+% In addition to prefix versions of the standard display commands, the package
+% \textsf{counterz} defines some variants of \cs{xarabic} that are useful in
+% the display of mathematical expressions. For example, consider the following
+% code:
+%
+%\begin{verbatim}
+%\xprovidecounter{a}
+%\xsetcounter{a}{5}
+%\xprovidecounter{b}
+%\xsetcounter{b}{0}
+%\xprovidecounter{c}
+%\xsetcounter{c}{-7}
+%$\xarabic{a}+\xarabic{b}+\xarabic{c}$
+%\end{verbatim}
+%
+% \noindent
+% which produces
+%
+% \bigskip
+%\xprovidecounter{a}
+%\xsetcounter{a}{5}
+%\xprovidecounter{b}
+%\xsetcounter{b}{0}
+%\xprovidecounter{c}
+%\xsetcounter{c}{-7}
+%$\xarabic{a}+\xarabic{b}+\xarabic{c}$
+%
+% \bigskip
+% \noindent
+% Using \cs{arabicx} causes the expression to contain the consecutive pair $+-$.
+% The command \cs{xsigned}\marg{counter} is like \cs{xarabic} except that
+%\DescribeMacro{\xsigned}
+% nonnegative values are preceded by a plus sign ``+''. The code
+%
+%\begin{verbatim}
+%$\xarabic{a}\xsigned{b}\xsigned{c}$
+%\end{verbatim}
+%
+% \noindent
+% produces
+%
+% \bigskip
+%$\xarabic{a}\xsigned{b}\xsigned{c}$
+%
+% \bigskip
+% \noindent
+% If we wish to suppress the $0$, we can instead use the command
+%\DescribeMacro{\xsignednz}
+% \cs{xsignednz}\marg{counter} which is a nonzero version of \cs{xsigned} and,
+% if desired or necessary, the command \cs{xarabicnz}\marg{counter} which is a
+%\DescribeMacro{\xarabicnz}
+% nonzero version of \cs{xarabic}. The code
+%
+%\begin{verbatim}
+%$\xarabicnz{a}\xsignednz{b}\xsignednz{c}$
+%\end{verbatim}
+%
+% \noindent
+% produces
+%
+% \bigskip
+%$\xarabicnz{a}\xsignednz{b}\xsignednz{c}$
+%
+% \bigskip
+% \noindent
+%\DescribeMacro{\xnegof}
+% The command \cs{xnegof}\marg{counter} displays the negative of \meta{counter}.
+% The command \cs{xnegofnz} does the same except that it suppresses the number
+%\DescribeMacro{\xnegofnz}
+% zero. The command \cs{xnegsigned} includes the appropriate signs of plus ``+''
+%\DescribeMacro{\xnegsigned}
+% and minus ``-'' (assigning a minus to zero in this case).
+%\DescribeMacro{\xnegsignednz}
+% Finally, the command \cs{xnegsignednz} does the same except that it suppresses
+% the number zero., as demonstrated by the following code:
+%
+%\begin{verbatim}
+%\xprovidecounter{d}
+%\xsetcounter{d}{-2}
+%
+%$\xarabic{a}\xsigned{b}\xsigned{c}=\xarabic{d}$
+%
+%$\xnegof{d}=\xnegof{a}\xnegsigned{b}\xnegsigned{c}$
+%
+%$\xnegofnz{d}=\xnegofnz{a}\xnegsignednz{b}\xnegsignednz{c}$
+%\end{verbatim}
+%
+% \noindent
+% which produces
+%
+% \bigskip
+%\xprovidecounter{d}
+%\xsetcounter{d}{-2}
+%
+%$\xarabic{a}\xsigned{b}\xsigned{c}=\xarabic{d}$
+%
+%$\xnegof{d}=\xnegof{a}\xnegsigned{b}\xnegsigned{c}$
+%
+%$\xnegofnz{d}=\xnegofnz{a}\xnegsignednz{b}\xnegsignednz{c}$
+%
+% \bigskip
+% The preceding commands for displaying values related to counters were created
+% by using some other commands that we make available in case they prove useful.
+%\DescribeMacro{\xabsof}
+% The command \cs{xabsof}\marg{counter} prints the absolute value of
+% \meta{counter}. The command \cs{xsignof}\marg{counter} prints a minus sign
+%\DescribeMacro{\xsignof}
+% ``-'' if \meta{counter} is negative and otherwise prints a plus sign ``+''.
+% (Note that the latter case includes the value zero.) The command
+%\DescribeMacro{\xnegsignof}
+% \cs{xnegsignof}\marg{counter} prints a plus sign ``+'' if \meta{counter} is
+% negative and otherwise prints a minus sign ``-''. (Note that the latter case
+% includes the value zero.)
+%
+% Additional variants of these commands suppress certain output, as is
+% conventional when using integers as coefficients in algebraic expressions.
+% The command \cs{xabsofcoef}\marg{counter} prints the absolute value of
+%\DescribeMacro{\xabsofcoef}
+% \meta{counter} except that it suppresses the values of 1 and 0. The command
+%\DescribeMacro{\xsignofcoef}
+% \cs{xsignofcoef}\marg{counter} prints the sign of \meta{counter} if the value
+% of \meta{counter} is nonzero. The command \cs{xnegsignofcoef}\marg{counter}
+%\DescribeMacro{\xnegsignofcoef}
+% prints the opposite sign of \meta{counter} if the value of \meta{counter} is
+% nonzero. These commands are used to build versions of \cs{xarabic} and
+% \cs{xsigned} specific to typesetting coefficients, as we now illustrate.
+%
+% Consider the following code
+%
+%\begin{verbatim}
+%\xprovidecounter{a0}
+%\xsetcounter{a0}{-10}
+%\xprovidecounter{a1}
+%\xsetcounter{a1}{1}
+%\xprovidecounter{a2}
+%\xsetcounter{a2}{-5}
+%\xprovidecounter{a3}
+%\xsetcounter{a3}{-1}
+%\xprovidecounter{a4}
+%\xsetcounter{a4}{0}
+%\xprovidecounter{a5}
+%\xsetcounter{a5}{11}
+%$\xarabic{a5}x^5 + \xarabic{a4}x^4 + \xarabic{a3}x^3 + \xarabic{a2}x^2
+%                 + \xarabic{a1}x   + \xarabic{a0}    = 42$
+%\end{verbatim}
+%
+% \noindent
+% and its output
+%
+% \bigskip
+%\xprovidecounter{a0}
+%\xsetcounter{a0}{-10}
+%\xprovidecounter{a1}
+%\xsetcounter{a1}{1}
+%\xprovidecounter{a2}
+%\xsetcounter{a2}{-5}
+%\xprovidecounter{a3}
+%\xsetcounter{a3}{-1}
+%\xprovidecounter{a4}
+%\xsetcounter{a4}{0}
+%\xprovidecounter{a5}
+%\xsetcounter{a5}{11}
+%$\xarabic{a5}x^5 + \xarabic{a4}x^4 + \xarabic{a3}x^3 + \xarabic{a2}x^2
+%                 + \xarabic{a1}x   + \xarabic{a0}    = 42$
+%
+% \bigskip
+% \noindent
+% We seek a better way to handle the coefficients, especially $1$ and $-1$. The
+% command \cs{xcoef}\marg{counter} prints the value of \meta{counter} except
+%\DescribeMacro{\xcoef}
+% that it suppresses the values of 1, 0, and -1, printing a minus sign ``-'' in
+% the latter case. The command \cs{xsignedcoef}\marg{counter} is like \cs{xcoef}
+%\DescribeMacro{\xsignedcoef}
+% except that positive values are preceded by a plus sign ``+''. We use these to
+% write the code
+%
+%\begin{verbatim}
+%$\xarabic{a5}x^5 + \xarabic{a4}x^4 + \xarabic{a3}x^3 + \xarabic{a2}x^2
+%                 + \xarabic{a1}x   + \xarabic{a0}    = 42$
+%
+%$\xcoef{a5}\ifctrzero{a5}{}{x^5}
+%   \xsignedcoef{a4}\ifctrzero{a4}{}{x^4}
+%   \xsignedcoef{a3}\ifctrzero{a3}{}{x^3}
+%   \xsignedcoef{a2}\ifctrzero{a2}{}{x^2}
+%   \xsignedcoef{a1}\ifctrzero{a1}{}{x}
+%   \xsignednz{a0}
+%   = 42$
+%\end{verbatim}
+%
+% \noindent
+% whose output is
+%
+% \bigskip
+%$\xarabic{a5}x^5 + \xarabic{a4}x^4 + \xarabic{a3}x^3 + \xarabic{a2}x^2
+%                 + \xarabic{a1}x   + \xarabic{a0}    = 42$
+%
+%$\xcoef{a5}\ifctrzero{a5}{}{x^5}
+%   \xsignedcoef{a4}\ifctrzero{a4}{}{x^4}
+%   \xsignedcoef{a3}\ifctrzero{a3}{}{x^3}
+%   \xsignedcoef{a2}\ifctrzero{a2}{}{x^2}
+%   \xsignedcoef{a1}\ifctrzero{a1}{}{x}
+%   \xsignednz{a0}
+%   = 42$
+%
+% \bigskip
+%\DescribeMacro{\xnegcoef}
+% The command \cs{xnegcoef}\marg{counter} prints the negative of the value of
+% \meta{counter} except that it suppresses the values of 1, 0, and -1, printing
+% a ``-'' in the latter case. The command \cs{xnegsignedcoef}\marg{counter} is
+%\DescribeMacro{\xnegsignedcoef}
+% like \cs{xnegcoef} except that positive values are preceded by a plus sign
+% ``+''. We use these to write the code
+%
+%\begin{verbatim}
+%$\xcoef{a5}\ifctrzero{a5}{}{x^5}
+%   \xsignedcoef{a4}\ifctrzero{a4}{}{x^4}
+%   \xsignedcoef{a3}\ifctrzero{a3}{}{x^3}
+%   \xsignedcoef{a2}\ifctrzero{a2}{}{x^2}
+%   \xsignedcoef{a1}\ifctrzero{a1}{}{x}
+%   \xsignednz{a0}
+%   = 42$
+%
+%$\xcoef{a5}\ifctrzero{a5}{}{x^5}
+%   \xsignedcoef{a4}\ifctrzero{a4}{}{x^4}
+%   \xsignedcoef{a2}\ifctrzero{a2}{}{x^2}
+%   \xsignednz{a0}
+%   = \xnegcoef{a3}\ifctrzero{a3}{}{x^3}
+%   \xnegsignedcoef{a1}\ifctrzero{a1}{}{x}
+%   +42$
+%\end{verbatim}
+%
+% \noindent
+% whose output is
+%
+% \bigskip
+%$\xcoef{a5}\ifctrzero{a5}{}{x^5}
+%   \xsignedcoef{a4}\ifctrzero{a4}{}{x^4}
+%   \xsignedcoef{a3}\ifctrzero{a3}{}{x^3}
+%   \xsignedcoef{a2}\ifctrzero{a2}{}{x^2}
+%   \xsignedcoef{a1}\ifctrzero{a1}{}{x}
+%   \xsignednz{a0}
+%   = 42$
+%
+%$\xcoef{a5}\ifctrzero{a5}{}{x^5}
+%   \xsignedcoef{a4}\ifctrzero{a4}{}{x^4}
+%   \xsignedcoef{a2}\ifctrzero{a2}{}{x^2}
+%   \xsignednz{a0}
+%   = \xnegcoef{a3}\ifctrzero{a3}{}{x^3}
+%   \xnegsignedcoef{a1}\ifctrzero{a1}{}{x}
+%   +42$
+%
+% \bigskip
+% As the reader has probably already observed in the code above, these display
+% commands appear to be less efficient than a manual adjustment of signs and
+% numbers. For fixed, known values of counters, this assessment is correct. The
+% real utility of these commands is not apparent until they are combined with
+% randomly generated counter values.
+%
+%\subsection{Random Counters}
+%
+% We first define random versions of \cs{setcounter} and \cs{addtocounter}.
+% The command \cs{randsetcounter}\marg{counter}\marg{min}\marg{max} assigns
+%\DescribeMacro{\randsetcounter}
+% to \meta{counter} a random integer value between \meta{min} and \meta{max}.
+%\DescribeMacro{\xrandsetcounter}
+% The command \cs{xrandsetcounter} is a prefix version of \cs{randsetcounter}.
+% Analogously, we define the command 
+%\DescribeMacro{\randaddtocounter}
+% \cs{randaddtocounter}\marg{counter}\marg{min}\marg{max} which adds to
+% \meta{counter} a random integer value between \meta{min} and \meta{max}.
+%\DescribeMacro{\xrandaddtocounter}
+% \cs{xrandaddtocounter} is a prefix version of \cs{randaddtocounter}.
+% The following code may be used to produce an expression in the form
+% $ax+b$, where $a$ and $b$ are random integers between $-10$ and $10$:
+%
+%\begin{verbatim}
+%\xprovidecounter{a}
+%\xprovidecounter{b}
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$
+%\end{verbatim}
+%
+% \noindent
+% Organized in the following table are sixty instances of output that are
+% randomly generated by the typesetting of this document:
+%
+% \bigskip
+%\noindent
+%\xprovidecounter{a}
+%\xprovidecounter{b}
+%\begin{tabular}{rrrrrr}
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ &
+%\xrandsetcounter{a}{-10}{10}
+%\xrandsetcounter{b}{-10}{10}
+%$\xcoef{a}\ifctrzero{a}{\xarabic{b}}{x \xsignednz{b}}$ \\
+%\end{tabular}
+%
+% \bigskip
+% In order to effectively manage the options of randomizing counter values or
+%\DescribeMacro{\randomizectr}
+% reusing counter values, the commands \cs{randomizectr} and \cs{norandomizectr}
+% are used to toggle an internal boolean variable. The internal boolean
+%\DescribeMacro{\norandomizectr}
+% is initialized as TRUE when the \textsf{counterz} package is loaded. A
+% conditional command \cs{ifrandomizectr}\marg{foo}\marg{bar} executes
+%\DescribeMacro{\ifrandomizectr}
+% \meta{foo} when the boolean is true and otherwise executes \meta{bar}.
+%
+% If our document contains randomly generated counters, but we wish to typeset
+% the document again without changing those values, then we need a way to save
+%\DescribeMacro{\opencountersfile}
+% them. The command \cs{opencountersfile} creates and opens the write stream to
+% the file \textsf{\meta{jobname}.counters.tex} to store the necessary
+% information. For example, if the document is
+% named \textsf{Yellowdog.tex}, then the previously generated counters and their
+% assigned values will be stored the file \textsf{Yellowdog.counters.tex}. 
+% The author only has to include this command once, prior to any commands used
+% to save the counter values. Additional instances of \cs{opencountersfile} will
+% report an error, as will trying to use the command when the document is set to
+% not randomize (e.g. \cs{norandomizectr}). These error reports are designed to
+% prevent the accidental overwriting of \textsf{\meta{jobname}.counters.tex}.
+%
+% After opening the write stream to \textsf{\meta{jobname}.counters.tex}, the
+% command \cs{savecounter}\marg{counter} may be used to ``save'' the value of
+%\DescribeMacro{\savecounter}
+% \textit{counter} by writing to the file the relevant \cs{providecounter} and
+% \cs{setcounter} commands. The command \cs{xsavecounter} is a prefix version of
+%\DescribeMacro{\xsavecounter}
+% \cs{savecounter}. When using \cs{xsavecounter}, the commands that are written
+% to the file include the necessary counter prefixes. Consequently, an author
+% can, if necessary or desired, manually search the file for the value assigned
+% to any randomly generated counter.
+%
+% Once we have generated a file for storing counters, we need a way to recover
+% those values during a subsequent typesetting. The command
+%\DescribeMacro{\inputcountersfile}
+% \cs{inputcountersfile} will input the necessary file, if it exists, and report
+% an error if it does not. Keep in mind that inputting the file will override
+% any previous assignments of those counters, so it is probably best to invoke
+% this command near the beginning of a document. For example, after including an
+% instance of either \cs{randomizectr} or \cs{norandomizectr}, a document named
+% \textsf{Yellowdog.tex} might include the code
+%
+%\begin{verbatim}
+%\ifrandomizectr{\opencountersfile}{\inputcountersfile}
+%\end{verbatim}
+%
+% \noindent
+% to determine whether to preload previously stored counter values or open the
+% write stream in anticipation of randomly generating new counter values.
+%
+%\DescribeMacro{\promptrandomizectr}
+% The command \cs{promptrandomizectr}\oarg{macro}\marg{message}\marg{string}
+% offers an alternative to manually switching between the commands
+% \cs{randomizectr} and \cs{norandomizectr} for different typesettings. The
+% contents of \meta{message} are displayed in the terminal, awaiting a response
+% from the user at the prompt \meta{macro}. If the optional argument is not used
+% then the default prompt is \cs{@typein}. If the optional argument is given, it
+% must be a macro name that includes the backslash. The user's response is
+% stored as a string in \meta{macro} and compared to \meta{string}. If they are
+% equal, then the command \cs{randomizectr} is executed. If they are not equal
+% then \cs{norandomizectr} is executed. 
+%
+% Consider the following example code:
+%
+%\begin{verbatim}
+%\promptrandomizectr[\EnterResponse]{%
+%   ^^J Enter 1 to randomize.
+%   ^^J Enter 2 to not randomize.
+%}{%
+%   1%
+%}%
+%\ifrandomizectr{%
+%   \opencountersfile
+%}{%
+%   \inputcountersfile
+%}%
+%\end{verbatim}
+%
+% \noindent
+% which displays the following in the terminal:
+%
+%\begin{verbatim}
+% Enter 1 to randomize.
+% Enter 2 to not randomize.
+%
+%\EnterResponse=
+%\end{verbatim}
+%
+% \noindent
+% Notice that the first (optional) argument \cs{EnterResponse} begins with a
+% backslash and is displayed with an equals sign ``='' at the prompt. Also note
+% that the second argument contains two instances of the text \texttt{\^{}\^{}J}
+% which is used to produce a line break in the terminal output. Next, note that
+% the third argument \texttt{1} is immediately followed by a percent symbol
+% \texttt{\%} to prevent extra space being included in the string. (If the
+% \texttt{1} was immediately followed by a closing brace instead of a line break
+% in the code, the percent symbol would not be used.) Finally, note that if the
+% user types a \texttt{1} in the terminal and presses Enter, then the commands
+% \cs{randomizectr} and \cs{opencountersfile} will be executed. If the user
+% enters \textit{any other text} or simply presses Enter with no text, then the
+% commands \cs{norandomizectr} and \cs{inputcountersfile} will be executed,
+% despite the instructions to enter a \texttt{2} to achieve this outcome.
+%
+%\DescribeMacro{\randprovidecounter}
+% The command \cs{randprovidecounter}\marg{counter}\marg{min}\marg{max}
+% combines the four commands \cs{providecounter}, \cs{ifrandomizectr},
+% \cs{randsetcounter}, and \cs{savecounter}. The command creates \meta{counter}
+% if it has not already been defined and, if the document is
+% randomized, assigns to \meta{counter} a random integer value between
+% \meta{min} and \meta{max} and saves this value to the counters file. The
+%\DescribeMacro{\randprovidecounternz}
+% command \cs{randprovidecounternz} is like \cs{randprovidecounter} except
+%\DescribeMacro{\xrandprovidecounter}
+% that the generated value is nonzero. The commands \cs{xrandprovidecounter} and
+%\DescribeMacro{\xrandprovidecounternz}
+% \cs{xrandprovidecounternz} are prefix versions of \cs{randprovidecounter} and
+% \cs{randprovidecounternz}, respectively. Suppose that \textsf{Neverending.tex}
+% contains the code
+%
+%\begin{verbatim}
+%\randomizectr
+%\ifrandomizectr{\opencountersfile}{}
+%\setcounterprefix{Southern}
+%\xrandprovidecounternz{Oracle}{-10}{10}
+%\xcoef{Oracle}x+42
+%\end{verbatim}
+%
+% \noindent
+% After typesetting once, the resulting document might display an expression
+% such as $-9x+42$ and print to \textsf{Neverending.counters.tex} the line
+%
+%\begin{verbatim}
+%\providecounter {SouthernOracle} \setcounter {SouthernOracle}{-9}
+%\end{verbatim}
+%
+% \noindent
+% After typesetting a second time, the resulting document might display $4x+42$
+% and print to \textsf{Neverending.counters.tex} the line
+%
+%\begin{verbatim}
+%\providecounter {SouthernOracle} \setcounter {SouthernOracle}{4}
+%\end{verbatim}
+%
+% \noindent
+% If, however, the command \cs{randomizectr} is replaced by \cs{norandomizectr},
+% then a third typesetting will leave both the displayed text and the counters
+% file unchanged.
+%
+%\StopEventually{^^A
+%  \PrintChanges
+%  \PrintIndex
+%}
+%
+%\section{Implementation}
+%
+% The \textsf{counterz} package loads the two packages \textsf{etoolbox} and
+% \textsf{makecmds} for the use of conditional tests (boolean and numerical)
+% and the macro \cs{providecounter}.
+%
+%    \begin{macrocode}
+%<*package>
+\ProvidesPackage{counterz}[%
+   2023/05/30 v1.1.0 Additional tools for counters
+]%
+\RequirePackage{etoolbox,makecmds}
+%    \end{macrocode}
+%
+%\subsection{Counter Prefixes}
+%
+%\begin{macro}{\@counterz@counterprefix}
+%\begin{macro}{\setcounterprefix}
+%\begin{macro}{\clearcounterprefix}
+%
+% The default expansion of \cs{@counterz@counterprefix} is null, but it can be
+% changed with the commands \cs{setcounterprefix} and \cs{clearcounterprefix}.
+%
+%    \begin{macrocode}
+\newcommand{\@counterz@counterprefix}{}
+\newcommand{\setcounterprefix}[1]{%
+   \renewcommand{\@counterz@counterprefix}{#1}
+}%
+\newcommand{\clearcounterprefix}{%
+   \setcounterprefix{}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Manipulating Counters}
+%
+%\begin{macro}{\xnewcounter}
+%\begin{macro}{\xprovidecounter}
+%\begin{macro}{\xsetcounter}
+%\begin{macro}{\xaddtocounter}
+%\begin{macro}{\xvalue}
+%
+% These commands are prefix versions of commands \cs{newcounter},
+% \cs{providecounter}, \cs{setcounter}, \cs{addtocounter}, and \cs{value},
+% respectively. The creation, modification, or use of the counters is carried
+% out on a prefixed version of the specified counter name. When
+% \cs{@counterz@counterprefix} is null, the commands expand like their standard
+% counterparts.
+%
+%    \begin{macrocode}
+\newcommand{\xnewcounter}[1]{%
+   \newcounter{\@counterz@counterprefix #1}
+}%
+\newcommand{\xprovidecounter}[1]{%
+   \providecounter{\@counterz@counterprefix #1}
+}%
+\newcommand{\xsetcounter}[2]{%
+   \setcounter{\@counterz@counterprefix #1}{#2}
+}%
+\newcommand{\xaddtocounter}[2]{%
+   \addtocounter{\@counterz@counterprefix #1}{#2}
+}%
+\newcommand{\xvalue}[1]{%
+   \value{\@counterz@counterprefix #1}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Conditional Statements}
+%
+% The following commands provide if-then-else constructs analogous to those in
+% the package \textsf{etoolbox}. The notable difference is that the arguments
+% are counter names. The command \cs{xvalue} is used to determine the values of
+% the counters, so that the stored prefix is applied to the specified counter
+% names before execution.
+%
+%\begin{macro}{\ifctrequal}
+%
+% \cs{ifctrequal}\marg{counter1}\marg{counter2}\marg{foo}\marg{bar} executes
+% \meta{foo} if the value of \meta{counter1} is equal to the value of
+% \meta{counter2} and otherwise executes \meta{bar}.
+%
+%    \begin{macrocode}
+\newcommand{\ifctrequal}[4]{%
+   \ifnumequal{\xvalue{#1}}{\xvalue{#2}}{#3}{#4}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\ifctrless}
+%
+% \cs{ifctrless}\marg{counter1}\marg{counter2}\marg{foo}\marg{bar} executes
+% \meta{foo} if the value of \meta{counter1} is less than the value of
+% \meta{counter2} and otherwise executes \meta{bar}.
+%
+%    \begin{macrocode}
+\newcommand{\ifctrless}[4]{%
+   \ifnumless{\xvalue{#1}}{\xvalue{#2}}{#3}{#4}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\ifctrmore}
+%
+% \cs{ifctrmore}\marg{counter1}\marg{counter2}\marg{foo}\marg{bar} executes
+% \meta{foo} if the value of \meta{counter1} is more than the value of
+% \meta{counter2} and otherwise executes \meta{bar}.
+%
+%    \begin{macrocode}
+\newcommand{\ifctrmore}[4]{%
+   \ifnumless{\xvalue{#2}}{\xvalue{#1}}{#3}{#4}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\ifctrzero}
+%
+% \cs{ifctrzero}\marg{counter}\marg{foo}\marg{bar} executes \meta{foo} if
+% the value of \meta{counter} is zero and otherwise executes \meta{bar}.
+%
+%    \begin{macrocode}
+\newcommand{\ifctrzero}[3]{%
+   \ifnumequal{\xvalue{#1}}{0}{#2}{#3}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\ifctrneg}
+%
+% \cs{ifctrneg}\marg{counter}\marg{foo}\marg{bar} executes \meta{foo} if the
+% value of \meta{counter} is negative and otherwise executes \meta{bar}.
+%
+%    \begin{macrocode}
+\newcommand{\ifctrneg}[3]{%
+   \ifnumless{\xvalue{#1}}{0}{#2}{#3}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\ifctrpos}
+%
+% \cs{ifctrpos}\marg{counter}\marg{foo}\marg{bar} executes \meta{foo} if the
+% value of \meta{counter} is positive and otherwise executes \meta{bar}.
+%
+%    \begin{macrocode}
+\newcommand{\ifctrpos}[3]{%
+   \ifnumless{\xvalue{#1}}{1}{#3}{#2}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\subsection{Displaying Counters}
+%
+%\begin{macro}{\xarabic}
+%\begin{macro}{\xroman}
+%\begin{macro}{\xRoman}
+%\begin{macro}{\xalph}
+%\begin{macro}{\xAlph}
+%\begin{macro}{\xfnsymbol}
+%
+% These commands include prefix versions of the standard display commands.
+%
+%    \begin{macrocode}
+\newcommand{\xarabic}[1]{\arabic{\@counterz@counterprefix #1}}
+\newcommand{\xroman}[1]{\roman{\@counterz@counterprefix #1}}
+\newcommand{\xRoman}[1]{\Roman{\@counterz@counterprefix #1}}
+\newcommand{\xalph}[1]{\alph{\@counterz@counterprefix #1}}
+\newcommand{\xAlph}[1]{\Alph{\@counterz@counterprefix #1}}
+\newcommand{\xfnsymbol}[1]{\fnsymbol{\@counterz@counterprefix #1}}
+%    \end{macrocode}
+%
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+% The following commands likewise apply the stored prefix to the counter name.
+% These commands are designed to aid in the typesetting of counter values within
+% algebraic expressions while observing particular conventions about the display
+% of numbers and their and their signs.
+%
+%\begin{macro}{\xabsof}
+%
+% \cs{xabsof}\marg{counter} prints the absolute value of \meta{counter}.
+%
+%    \begin{macrocode}
+\newcommand{\xabsof}[1]{%
+   \ifctrneg{#1}{%
+      \the \numexpr 0 - \xvalue{#1} \relax%
+   }{%
+      \xarabic{#1}%
+   }%
+}
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xsignof}
+%
+% \cs{xsignof}\marg{counter} prints a minus sign ``-'' if \meta{counter} is
+% negative and otherwise prints a plus sign ``+''. Note that the latter case
+% includes the value zero.
+%
+%    \begin{macrocode}
+\newcommand{\xsignof}[1]{%
+   \ifctrneg{#1}{-}{+}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xnegsignof}
+%
+% \cs{xnegsignof}\marg{counter} prints a plus sign ``+'' if \meta{counter} is
+% negative and otherwise prints a minus sign ``-''. Note that the latter case
+% includes the value zero.
+%
+%    \begin{macrocode}
+\newcommand{\xnegsignof}[1]{%
+   \ifctrneg{#1}{+}{-}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xsigned}
+%
+% \cs{xsigned}\marg{counter} prints the absolute value of \meta{counter},
+% preceded by a plus sign ``+'' or a minus sign ``-'' as defined by
+% \cs{xsignof}.
+%
+%    \begin{macrocode}
+\newcommand{\xsigned}[1]{%
+   \xsignof{#1} \xabsof{#1}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xsignednz}
+%
+% \cs{xsignednz}\marg{counter} is like \cs{xsigned} but suppresses the number
+% zero.
+%
+%    \begin{macrocode}
+\newcommand{\xsignednz}[1]{%
+   \ifctrzero{#1}{}{\xsigned{#1}}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xarabicnz}
+%
+% \cs{xarabicnz}\marg{counter} is like \cs{xarabic} but suppresses the number
+% zero.
+%
+%    \begin{macrocode}
+\newcommand{\xarabicnz}[1]{%
+   \ifctrzero{#1}{}{\xarabic{#1}}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xnegsigned}
+%
+% \cs{xnegsigned}\marg{counter} prints the absolute value of \meta{counter},
+% preceded by a plus sign ``+'' or a minus sign ``-'' as defined by
+% \cs{xnegsignof}.
+%
+%    \begin{macrocode}
+\newcommand{\xnegsigned}[1]{%
+   \xnegsignof{#1} \xabsof{#1}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xnegsignednz}
+%
+% \cs{xnegsignednz}\marg{counter} is like \cs{xnegsigned} but suppresses the
+% number zero.
+%
+%    \begin{macrocode}
+\newcommand{\xnegsignednz}[1]{%
+   \ifctrzero{#1}{}{\xnegsigned{#1}}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xnegof}
+%
+% \cs{xnegof}\marg{counter} prints the negative of the value of \meta{counter}.
+%
+%    \begin{macrocode}
+\newcommand{\xnegof}[1]{%
+   \ifctrpos{#1}{-}{}\xabsof{#1}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xnegofnz}
+%
+% \cs{xnegofnz}\marg{counter} is like \cs{xnegof} but suppresses the number
+% zero.
+%
+%    \begin{macrocode}
+\newcommand{\xnegofnz}[1]{%
+   \ifctrzero{#1}{}{\xnegof{#1}}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xcoef}
+%
+% \cs{xcoef}\marg{counter} prints the value of \meta{counter} except that it
+% suppresses the values of 1, 0, and -1, printing a ``-'' in the latter case.
+%
+%    \begin{macrocode}
+\newcommand{\xcoef}[1]{%
+   \ifboolexpr{%
+      test {\ifnumless{\xvalue{#1}}{-1}}
+      or test {\ifnumgreater{\xvalue{#1}}{1}}
+   }{%
+      \xarabic{#1}
+   }{%
+   }%
+   \ifnumequal{\xvalue{#1}}{-1}{-}{}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xnegcoef}
+%
+% \cs{xnegcoef}\marg{counter} prints the value of \meta{counter} except that it
+% suppresses the values of 1, 0, and -1, printing a ``-'' in the former case.
+%
+%    \begin{macrocode}
+\newcommand{\xnegcoef}[1]{%
+   \ifboolexpr{%
+      test {\ifnumless{\xvalue{#1}}{-1}}
+      or test {\ifnumgreater{\xvalue{#1}}{1}}
+   }{%
+      \xnegof{#1}
+   }{%
+   }%
+   \ifnumequal{\xvalue{#1}}{1}{-}{}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xabsofcoef}
+%
+% \cs{xabsofcoef}\marg{counter} prints the absolute value of \meta{counter}
+% except that it suppresses the values of 1 and 0.
+%
+%    \begin{macrocode}
+\newcommand{\xabsofcoef}[1]{%
+   \ifboolexpr{%
+      test {\ifnumless{\xvalue{#1}}{-1}}
+      or test {\ifnumgreater{\xvalue{#1}}{1}}
+   }{%
+      \xabsof{#1}
+   }{%
+   }%
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xsignofcoef}
+%
+% \cs{xsignofcoef}\marg{counter} prints the sign of \meta{counter} if
+% \meta{counter} is nonzero.
+%
+%    \begin{macrocode}
+\newcommand{\xsignofcoef}[1]{%
+   \ifctrzero{#1}{}{\xsignof{#1}}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xnegsignofcoef}
+%
+% \cs{xnegsignofcoef}\marg{counter} prints the opposite sign of \meta{counter}
+% if \meta{counter} is nonzero.
+%
+%    \begin{macrocode}
+\newcommand{\xnegsignofcoef}[1]{%
+   \ifctrzero{#1}{}{\xnegsignof{#1}}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xsignedcoef}
+%
+% \cs{xsignedcoef}\marg{counter} is like \cs{xcoef} except that positive values
+% are preceded by a plus sign ``+''. 
+%
+%    \begin{macrocode}
+\newcommand{\xsignedcoef}[1]{%
+   \xsignofcoef{#1} \xabsofcoef{#1}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xnegsignedcoef}
+%
+% \cs{xnegsignedcoef}\marg{counter} is like \cs{xsignedcoef} except using the
+% opposite sign. 
+%
+%    \begin{macrocode}
+\newcommand{\xnegsignedcoef}[1]{%
+   \xnegsignofcoef{#1} \xabsofcoef{#1}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\subsection{Random Counters}
+%
+% The commands \cs{randsetcounter} and \cs{randaddtocounter} use the pdf\TeX\
+% primitive \cs{pdfuniformdeviate} to provide random versions of
+% \cs{setcounter} and \cs{addtocounter}. The commands \cs{xrandsetcounter} and
+% \cs{xrandaddtocounter} are prefix versions of \cs{randsetcounter} and
+% \cs{randaddtocounter}, respectively.
+%
+%\begin{macro}{\randsetcounter}
+%\changes{v1.1.0}{2023/05/30}{new}
+%\begin{macro}{\xrandsetcounter}
+%\changes{v1.1.0}{2023/05/30}{now based on a new \cs{randsetcounter}}
+%
+% \cs{randsetcounter}\marg{counter}\marg{min}\marg{max} assigns to
+% \meta{counter} a random integer value between \meta{min} and \meta{max}.
+%
+%    \begin{macrocode}
+\newcommand{\randsetcounter}[3]{%
+   \setcounter{#1}{%
+      \the \numexpr #2+\pdfuniformdeviate \numexpr #3-#2+1 \relax
+   }%
+}%
+\newcommand{\xrandsetcounter}[3]{%
+   \randsetcounter{\@counterz@counterprefix#1}{#2}{#3}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\randaddtocounter}
+%\changes{v1.1.0}{2023/05/30}{new}
+%\begin{macro}{\xrandaddtocounter}
+%\changes{v1.1.0}{2023/05/30}{now based on a new \cs{randaddtocounter}}
+%
+% \cs{randaddtocounter}\marg{counter}\marg{min}\marg{max} adds to \meta{counter}
+% a random integer value between \meta{min} and \meta{max}.
+%
+%    \begin{macrocode}
+\newcommand{\randaddtocounter}[3]{%
+   \addtocounter{#1}{%
+      \the \numexpr #2+\pdfuniformdeviate \numexpr #3-#2+1 \relax
+   }%
+}%
+\newcommand{\xrandaddtocounter}[3]{%
+   \randaddtocounter{\@counterz@counterprefix#1}{#2}{#3}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%\end{macro}
+% The following commands are designed to provide a means by which authors can
+% generate random values for counters but also preserve those values for future
+% typesettings. This is accomplished by storing counters and their values in an
+% external file and then inputting the file before a subsequent typesetting.
+%
+%\begin{macro}{\randomizectr}
+%\begin{macro}{\norandomizectr}
+%
+% In order to assign a random value to a counter during one typesetting and
+% avoid overwriting this value with a random assignment during another
+% typesetting, the boolean \textit{@counterz@random} is used to distinguish
+% between the two typesetting options. The value of \textit{@counterz@random} may
+% be changed by the commands \cs{randomizectr} and \cs{norandomizectr}.
+%
+%    \begin{macrocode}
+\newbool{@counterz@random}
+\booltrue{@counterz@random}
+\newcommand{\randomizectr}{\booltrue{@counterz@random}}
+\newcommand{\norandomizectr}{\boolfalse{@counterz@random}}
+%    \end{macrocode}
+%
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\ifrandomizectr}
+%
+% \cs{ifrandomizectr}\marg{foo}\marg{bar} executes \meta{foo} if the boolean
+% \textit{@counterz@random} is true and otherwise executes \meta{bar}.
+%
+%    \begin{macrocode}
+\newcommand{\ifrandomizectr}[2]{%
+   \ifbool{@counterz@random}{#1}{#2}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\promptrandomizectr}
+%\changes{v1.1.0}{2023/05/30}{new}
+%
+% \cs{promptrandomizectr}\oarg{command}\marg{message}\marg{string} writes
+% \meta{message} to the terminal and awaits a response from the user at the
+% prompt. The user's response is stored in \meta{command} and compared to the
+% text of \meta{string}. If they are equal, then \cs{randomizectr} is executed.
+% If they are not equal, then \cs{norandomizectr} is executed.
+%
+%    \begin{macrocode}
+\newcommand{\promptrandomizectr}[3][\@typein]{%
+   \typein[#1]{#2}
+   \ifdefstring{#1}{#3}{%
+      \randomizectr
+   }{%
+      \norandomizectr
+   }%
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\opencountersfile}
+%\changes{v1.1.0}{2023/05/30}{new error reports}
+%
+% The command \cs{opencountersfile} creates and opens the write stream to the
+% file \textsf{\meta{jobname}.counters.tex}, referenced by the macro
+% \cs{countersfile}. If the file already exists, it is overwritten. For this
+% reason, 
+%
+%    \begin{macrocode}
+\newbool{@counterz@fileISopen}
+\boolfalse{@counterz@fileISopen}
+\newcommand{\opencountersfile}{%
+   \ifbool{@counterz@fileISopen}{%
+      \PackageError{counterz}{%
+         The write stream is already open!
+         \MessageBreak Process interrupted to prevent overwriting
+         \MessageBreak \jobname.counters.tex
+      }{%
+         Be sure to include only one instance of
+         \protect\opencountersfile.
+      }%
+   }{%
+      \ifrandomizectr{%
+         \newwrite\countersfile
+         \immediate\openout\countersfile=\jobname.counters.tex
+         \booltrue{@counterz@fileISopen}
+      }{%
+         \PackageError{counterz}{%
+            \protect\opencountersfile\space requires
+            \protect\randomizectr
+            \MessageBreak Process interrupted to prevent overwriting
+            \MessageBreak \jobname.counters.tex
+         }{%
+            \protect\opencountersfile\space is designed to open a file
+            for saving newly randomized counters. See the Random
+            Counters section of the counterz package documentation for
+            details.
+         }%
+      }%
+   }%
+}
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\inputcountersfile}
+%\changes{v1.1.0}{2023/05/30}{new}
+%
+% The command \cs{inputcountersfile} inputs \textsf{\meta{jobname}.counters.tex}
+% if the file exists and reports a package error if the file does not exist.
+%
+%    \begin{macrocode}
+\newcommand{\inputcountersfile}{%
+   \InputIfFileExists{\jobname.counters}{%
+   }{%
+      \PackageError{counterz}{%
+         The file \jobname.counters.tex does not exist.
+      }{%
+         See the Random Counters section of the counterz package
+         documentation.
+      }%
+   }%
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\@counterz@openbrace}
+%\begin{macro}{\@counterz@closebrace}
+%
+% The commands \cs{@counterz@openbrace} and \cs{@counterz@closebrace}
+% facilitate the writing of the brace delimiters to \cs{countersfile}.
+%
+%    \begin{macrocode}
+\begingroup
+   \catcode`<=1 \catcode`>=2
+   \catcode`{=12 \catcode`}=12
+   \gdef\@counterz@openbrace<{>
+   \gdef\@counterz@closebrace<}>
+\endgroup
+%    \end{macrocode}
+%
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\savecounter}
+%\changes{v1.1.0}{2023/05/30}{new}
+%\begin{macro}{\xsavecounter}
+%\changes{v1.1.0}{2023/05/30}{now based on a new \cs{savecounter}}
+%
+% \cs{savecounter}\marg{counter} writes \cs{providecounter} and \cs{setcounter}
+% commands to the file \textsf{\meta{jobname}.counters.tex} so that they may be
+% inputted as part of a future typesetting. The command reports a package error
+% if the write stream to \textsf{\meta{jobname}.counters.tex} is not open. The
+% command \cs{xsavecounter} is a prefix version of \cs{savecounter}.
+%
+%
+%    \begin{macrocode}
+\newcommand{\savecounter}[1]{%
+   \ifbool{@counterz@fileISopen}{%
+      \immediate\write\countersfile{%
+         \unexpanded{\providecounter}
+         \@counterz@openbrace#1\@counterz@closebrace
+         \unexpanded{\setcounter}
+         \@counterz@openbrace#1\@counterz@closebrace
+         \@counterz@openbrace\arabic{#1}\@counterz@closebrace
+      }%
+   }{%
+      \PackageError{counterz}{%
+         The write stream to the file \jobname.counters.tex must be
+         opened before \protect\savecounter\space can be executed.
+      }{%
+         See \protect\opencountersfile\space and
+         \protect\savecounter\space in the counterz package
+         documentation.
+      }%
+   }%
+}%
+
+\newcommand{\xsavecounter}[1]{%
+   \savecounter{\@counterz@counterprefix#1}%
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\randprovidecounter}
+%\changes{v1.1.0}{2023/05/30}{new}
+%
+% \cs{randprovidecounter}\marg{counter}\marg{min}\marg{max} creates
+% \meta{counter} if it does not already exist, and if the boolean
+% \textit{@counterz@random} is true then \meta{counter} is assigned a
+% random integer value between \meta{min} and \meta{max} and then saved.
+%
+%    \begin{macrocode}
+\newcommand{\randprovidecounter}[3]{%
+   \ifltxcounter{#1}{%
+      \@ifnextchar]{%
+         \m@k@gobbleendoptarg
+      }{%
+      }%
+   }{%
+      \newcounter{#1}
+      \ifrandomizectr{%
+         \randsetcounter{#1}{#2}{#3}
+         \savecounter{#1}
+      }{%
+      }%
+   }%
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\xrandprovidecounter}
+%\changes{v1.1.0}{2023/05/30}{no longer randomizes if already defined;
+%now based on a new \cs{randprovidecounter}}
+%
+% \cs{xrandprovidecounter}\marg{counter}\marg{min}\marg{max} creates
+% \meta{counter} if it does not already exist, and if the boolean
+% \textit{@counterz@random} is true then \meta{counter} is assigned a
+% random integer value between \meta{min} and \meta{max} and then saved.
+%
+%    \begin{macrocode}
+\newcommand{\xrandprovidecounter}[3]{%
+   \randprovidecounter{\@counterz@counterprefix#1}{#2}{#3}
+}%
+%    \end{macrocode}
+%
+%\end{macro}
+%
+%\begin{macro}{\randprovidecounternz}
+%\changes{v1.1.0}{2023/05/30}{new}
+%
+% \cs{randprovidecounternz}\marg{counter}\marg{min}\marg{max} does the same
+% job as the command \cs{xrandprovidecounter} except that the value of
+% \meta{counter} is randomized until it is nonzero.
+%
+%    \begin{macrocode}
+\newcommand{\randprovidecounternz}[3]{%
+   \ifltxcounter{#1}{%
+      \@ifnextchar]{%
+         \m@k@gobbleendoptarg
+      }{%
+      }%
+   }{%
+      \newcounter{#1}
+      \ifrandomizectr{%
+         \setcounter{#1}{0}
+         \whileboolexpr{test {\ifnumequal{\value{#1}}{0}}}{%
+            \randsetcounter{#1}{#2}{#3}
+         }%
+         \savecounter{#1}
+      }{%
+      }%
+   }%
+}%
+%    \end{macrocode}
+%
+%\end{macro}%
+%
+%\begin{macro}{\xrandprovidecounternz}
+%\changes{v1.1.0}{2023/05/30}{no longer randomizes if already defined;
+%now based on a new \cs{randprovidecounternz}}
+%
+% \cs{xrandprovidecounternz}\marg{counter}\marg{min}\marg{max} does the same
+% job as the command \cs{xrandprovidecounter} except that the value of
+% \meta{counter} is randomized until it is nonzero.
+%
+%    \begin{macrocode}
+\newcommand{\xrandprovidecounternz}[3]{%
+   \randprovidecounternz{\@counterz@counterprefix#1}{#2}{#3}
+}%
+%    \end{macrocode}
+%
+%\end{macro}%
+%
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+%\Finale
