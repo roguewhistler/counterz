@@ -6,7 +6,7 @@
 %%
 %% counterz.dtx  (with options: `package')
 %% ----------------------------------------------------------------------
-%% `counterz' --- 2023/05/30 Version 1.1.0 Additional tools for counters
+%% `counterz' --- 2023/06/05 Version 1.1.1 Additional tools for counters
 %% E-mail: christopher.mcclain@mail.wvu.edu
 %% Released under the LaTeX Project Public License v1.3c or later
 %% See https://www.latex-project.org/lppl.txt
@@ -21,7 +21,7 @@
 \NeedsTeXFormat{LaTeX2e}
 
 \ProvidesPackage{counterz}[%
-   2023/05/30 v1.1.0 Additional tools for counters
+   2023/06/05 v1.1.1 Additional tools for counters
 ]%
 \RequirePackage{etoolbox,makecmds}
 \newcommand{\@counterz@counterprefix}{}
@@ -145,22 +145,6 @@
 \newcommand{\xnegsignedcoef}[1]{%
    \xnegsignofcoef{#1} \xabsofcoef{#1}
 }%
-\newcommand{\randsetcounter}[3]{%
-   \setcounter{#1}{%
-      \the \numexpr #2+\pdfuniformdeviate \numexpr #3-#2+1 \relax
-   }%
-}%
-\newcommand{\xrandsetcounter}[3]{%
-   \randsetcounter{\@counterz@counterprefix#1}{#2}{#3}
-}%
-\newcommand{\randaddtocounter}[3]{%
-   \addtocounter{#1}{%
-      \the \numexpr #2+\pdfuniformdeviate \numexpr #3-#2+1 \relax
-   }%
-}%
-\newcommand{\xrandaddtocounter}[3]{%
-   \randaddtocounter{\@counterz@counterprefix#1}{#2}{#3}
-}%
 \newbool{@counterz@random}
 \booltrue{@counterz@random}
 \newcommand{\randomizectr}{\booltrue{@counterz@random}}
@@ -175,6 +159,30 @@
    }{%
       \norandomizectr
    }%
+}%
+\newcommand{\randsetcounter}[3]{%
+   \ifrandomizectr{%
+      \setcounter{#1}{%
+         \the \numexpr #2+\pdfuniformdeviate \numexpr #3-#2+1 \relax
+      }%
+   }{%
+      % Do Nothing
+   }%
+}%
+\newcommand{\xrandsetcounter}[3]{%
+   \randsetcounter{\@counterz@counterprefix#1}{#2}{#3}
+}%
+\newcommand{\randaddtocounter}[3]{%
+   \ifrandomizectr{%
+      \addtocounter{#1}{%
+         \the \numexpr #2+\pdfuniformdeviate \numexpr #3-#2+1 \relax
+      }%
+   }{%
+      % Do Nothing
+   }%
+}%
+\newcommand{\xrandaddtocounter}[3]{%
+   \randaddtocounter{\@counterz@counterprefix#1}{#2}{#3}
 }%
 \newbool{@counterz@fileISopen}
 \boolfalse{@counterz@fileISopen}
